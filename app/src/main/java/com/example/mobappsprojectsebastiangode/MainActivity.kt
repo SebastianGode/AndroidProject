@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         navView.setNavigationItemSelectedListener {
 
+
             // Highlight the current selected Item
             it.isChecked = true
 
@@ -42,6 +43,9 @@ class MainActivity : AppCompatActivity() {
 
             true
         }
+
+        // Default Page is Home
+        replaceFragment(HomeFragment(), "Home")
     }
 
     // Method for replacing fragments
