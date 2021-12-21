@@ -1,10 +1,24 @@
 package com.example.mobappsprojectsebastiangode
 
+import android.app.AlertDialog
+import android.content.*
+import android.content.ContentValues.TAG
+import android.database.Cursor
 import android.os.Bundle
+import android.os.IBinder
+import android.provider.ContactsContract
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
+import java.util.jar.Manifest
+import androidx.core.content.ContentResolverCompat
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -27,6 +41,21 @@ class HomeFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+//        // Display Notification for Contact Permissions
+//        val contactNotification = AlertDialog.Builder(context)
+//        contactNotification.setMessage("In Order to manage contacts, allow the access of your" +
+//                " contact list in the next step")
+//        contactNotification.setCancelable(false)
+//        contactNotification.setPositiveButton(
+//            "OK",
+//            DialogInterface.OnClickListener{
+//                    dialog, _ -> dialog.cancel()
+//            }
+//        )
+//        val alertNotification:AlertDialog = contactNotification.create()
+//        alertNotification.show()
+
     }
 
     override fun onCreateView(
@@ -36,6 +65,7 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
+
 
     companion object {
         /**
@@ -56,4 +86,5 @@ class HomeFragment : Fragment() {
                 }
             }
     }
+
 }
