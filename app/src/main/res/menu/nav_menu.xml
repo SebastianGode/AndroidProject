@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:title="Home"/>
+
+    <item
+        android:id="@+id/nav_import"
+        android:icon="@drawable/ic_baseline_arrow_downward_24"
+        android:title="Import"/>
+
+    <item
+        android:id="@+id/nav_export"
+        android:icon="@drawable/ic_baseline_arrow_upward_24"
+        android:title="Export"/>
+
+    <item android:title="communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_baseline_share_24"
+                android:title="Share"/>
+
+        </menu>
+    </item>
+
+
+</menu>
