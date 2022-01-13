@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mService: LocalService
     private var mBound: Boolean = false
 
-    private var pickContact: Int = -10
 
     /** Defines callbacks for service binding, passed to bindService()  */
     private val connection = object : ServiceConnection {
@@ -139,7 +138,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "number: $num", Toast.LENGTH_SHORT).show()
 
             // get all contacts which have an email or phone number
-            val names = mService.getNamePhoneDetails()
+            val names = mService.getContacts()
             Toast.makeText(this, "number: $names", Toast.LENGTH_SHORT).show()
         }
 
