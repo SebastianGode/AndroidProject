@@ -1,5 +1,6 @@
 package com.example.mobappsprojectsebastiangode
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,7 @@ import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
+import android.provider.ContactsContract
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -18,6 +20,14 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
+import android.app.Activity
+import android.database.Cursor
+import android.net.Uri
+import android.content.ContentResolver
+
+
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,6 +36,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mService: LocalService
     private var mBound: Boolean = false
+
+    private var pickContact: Int = -10
 
     /** Defines callbacks for service binding, passed to bindService()  */
     private val connection = object : ServiceConnection {
@@ -125,7 +137,31 @@ class MainActivity : AppCompatActivity() {
             // occur in a separate thread to avoid slowing down the activity performance.
             val num: Int = mService.randomNumber
             Toast.makeText(this, "number: $num", Toast.LENGTH_SHORT).show()
+
+            // get all contacts which have an email or phone number
+            val names = mService.getNamePhoneDetails()
+            Toast.makeText(this, "number: $names", Toast.LENGTH_SHORT).show()
         }
+
+
     }
+
+//    @SuppressLint("Range")
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        when (requestCode) {
+//            pickContact -> if (resultCode == RESULT_OK) {
+//                val contactData: Uri? = data?.data
+//                val c: Cursor? = contactData?.let { contentResolver.query(it, null, null, null, null) }
+//                if (c != null) {
+//                    if (c.moveToFirst()) {
+//                        val name: String =
+//                            c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+//                        Toast.makeText(this, "Name: $name", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 }
