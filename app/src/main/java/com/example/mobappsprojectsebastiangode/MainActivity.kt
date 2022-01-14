@@ -1,5 +1,6 @@
 package com.example.mobappsprojectsebastiangode
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
@@ -24,9 +25,10 @@ import android.app.Activity
 import android.database.Cursor
 import android.net.Uri
 import android.content.ContentResolver
-
-
-
+import android.content.pm.PackageManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mService: LocalService
     private var mBound: Boolean = false
+
+    var permissionReadContact: Boolean = false
 
 
     /** Defines callbacks for service binding, passed to bindService()  */
@@ -118,6 +122,8 @@ class MainActivity : AppCompatActivity() {
         Intent(this, LocalService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
+        // Check for Permissions and request if necessary
+        onClickRequestPermission()
 
     }
 
@@ -129,21 +135,61 @@ class MainActivity : AppCompatActivity() {
 
     /** Called when a button is clicked (the button in the layout file attaches to
      * this method with the android:onClick attribute)  */
-    fun onButtonClick(v: View) {
-        if (mBound) {
-            // Call a method from the LocalService.
-            // However, if this call were something that might hang, then this request should
-            // occur in a separate thread to avoid slowing down the activity performance.
-            val num: Int = mService.randomNumber
-            Toast.makeText(this, "number: $num", Toast.LENGTH_SHORT).show()
+    fun onContactListButtonClick(v: View) {
 
-            // get all contacts which have an email or phone number
-            val names = mService.getContacts()
-            Toast.makeText(this, "number: $names", Toast.LENGTH_SHORT).show()
+        // If boundService connected start the actual activity
+        if (mBound) {
+            // Check for Permissions and request if necessary
+            onClickRequestPermission()
+            // Only start Read Contacts when permission granted, else app will crash
+            if (permissionReadContact) {
+                // get all contacts which have an email or phone number
+                val names = mService.getContacts()
+                Toast.makeText(this, "number: $names", Toast.LENGTH_SHORT).show()
+            }
+
         }
 
 
     }
+
+    // Create PermissionLauncher to request permissions if necessary
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            permissionReadContact = isGranted
+        }
+
+    // Check for permissions and call requestPermissionLauncher to ask user to get permission
+    private fun onClickRequestPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_CONTACTS
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // Permission granted, so set check to true
+                permissionReadContact = true
+            }
+
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.READ_CONTACTS
+            ) -> {
+
+                requestPermissionLauncher.launch(
+                    Manifest.permission.READ_CONTACTS
+                )
+            }
+            else -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.READ_CONTACTS
+                )
+            }
+        }
+    }
+
+
 
 //    @SuppressLint("Range")
 //    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
