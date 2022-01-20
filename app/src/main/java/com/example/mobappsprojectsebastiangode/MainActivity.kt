@@ -2,10 +2,6 @@ package com.example.mobappsprojectsebastiangode
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
@@ -22,13 +18,18 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.*
 import android.database.Cursor
 import android.net.Uri
-import android.content.ContentResolver
 import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
+import com.google.android.material.snackbar.Snackbar
 
 
 class MainActivity : AppCompatActivity() {
@@ -73,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         navView.setNavigationItemSelectedListener {
 
 
-            // Highlight the current selected Item
+            // Highlight the current selected Item in NavBar
             it.isChecked = true
 
             // Switch Fragments when user clicks on Items in NavDrawer
@@ -123,8 +124,7 @@ class MainActivity : AppCompatActivity() {
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
         // Check for Permissions and request if necessary
-        onClickRequestPermission()
-
+        alertContactPermission()
     }
 
     override fun onStop() {
@@ -135,12 +135,12 @@ class MainActivity : AppCompatActivity() {
 
     /** Called when a button is clicked (the button in the layout file attaches to
      * this method with the android:onClick attribute)  */
-    fun onContactListButtonClick(v: View) {
+    fun onContactListButtonClick() {
 
         // If boundService connected start the actual activity
         if (mBound) {
             // Check for Permissions and request if necessary
-            onClickRequestPermission()
+            alertContactPermission()
             // Only start Read Contacts when permission granted, else app will crash
             if (permissionReadContact) {
                 // get all contacts which have an email or phone number
@@ -176,7 +176,6 @@ class MainActivity : AppCompatActivity() {
                 this,
                 Manifest.permission.READ_CONTACTS
             ) -> {
-
                 requestPermissionLauncher.launch(
                     Manifest.permission.READ_CONTACTS
                 )
@@ -188,6 +187,33 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun alertContactPermission() {
+        // Create AlertDialog
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.Notice)
+        // Set message
+        builder.setMessage(R.string.AlertContact)
+        // Add an okay button and call the Request Permissions on clicking it
+        builder.setNeutralButton(R.string.ok){ _,_ ->
+            onClickRequestPermission()
+        }
+
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.setCancelable(false)
+        // Show the Dialog when Permission isn't granted
+        if (
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_CONTACTS
+            ) == PackageManager.PERMISSION_DENIED) {
+            alertDialog.show()
+        }
+
+    }
+
+
+
 
 
 
