@@ -11,4 +11,6 @@
     <string name="ok">OK</string>
     <string name="notice">Notice</string>
     <string name="person">Person</string>
+    <string name="phone">Phone</string>
+    <string name="name">Name</string>
 </resources>
