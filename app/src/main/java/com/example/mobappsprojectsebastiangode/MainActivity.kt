@@ -1,35 +1,23 @@
 package com.example.mobappsprojectsebastiangode
 
 import android.Manifest
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
-import android.provider.ContactsContract
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.tabs.TabLayout
-import android.app.Activity
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.*
-import android.database.Cursor
-import android.net.Uri
 import android.content.pm.PackageManager
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentManager
-import com.google.android.material.snackbar.Snackbar
 
 
 class MainActivity : AppCompatActivity() {
@@ -91,7 +79,7 @@ class MainActivity : AppCompatActivity() {
 
 
         // Default Page is Home
-        replaceFragment(HomeFragment(), "Home")
+        replaceFragment(HomeFragment(), getString(R.string.home))
     }
 
     // Method for replacing fragments
@@ -135,17 +123,19 @@ class MainActivity : AppCompatActivity() {
 
     /** Called when a button is clicked (the button in the layout file attaches to
      * this method with the android:onClick attribute)  */
-    fun onContactListButtonClick() {
-
+    fun onContactListButtonClick(v: View) {
+        Log.e("Test:", mBound.toString())
         // If boundService connected start the actual activity
         if (mBound) {
             // Check for Permissions and request if necessary
             alertContactPermission()
+            Log.e("Test:", permissionReadContact.toString())
             // Only start Read Contacts when permission granted, else app will crash
             if (permissionReadContact) {
                 // get all contacts which have an email or phone number
                 val names = mService.getContacts()
                 Toast.makeText(this, "number: $names", Toast.LENGTH_SHORT).show()
+                listContacts(names)
             }
 
         }
@@ -191,9 +181,9 @@ class MainActivity : AppCompatActivity() {
     private fun alertContactPermission() {
         // Create AlertDialog
         val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.Notice)
+        builder.setTitle(R.string.notice)
         // Set message
-        builder.setMessage(R.string.AlertContact)
+        builder.setMessage(R.string.alertContact)
         // Add an okay button and call the Request Permissions on clicking it
         builder.setNeutralButton(R.string.ok){ _,_ ->
             onClickRequestPermission()
@@ -209,7 +199,39 @@ class MainActivity : AppCompatActivity() {
             ) == PackageManager.PERMISSION_DENIED) {
             alertDialog.show()
         }
+        else {
+            permissionReadContact = true
+        }
 
+    }
+
+    private fun listContacts(contacts: ArrayList<LocalService.Contact>) {
+        // Create arrayAdapter to display a list
+        val arrayAdapter: ArrayAdapter<*>
+
+        // Simplify the data class LocalService.Contact to a String
+        val contactSimple = ArrayList<String>()
+        for (contact in contacts) {
+            contactSimple.add(contact.name + "\n" + contact.number)
+        }
+
+        // Get the listView on the Home Fragment
+        val contactList = findViewById<ListView>(R.id.listViewContacts)
+        // Create IDs for each element
+        val id : Int = R.id.txtListElement
+
+        // Fill the ListView with the custom contact_list_template
+        arrayAdapter = ArrayAdapter(this,
+            R.layout.contact_list_template, id, contactSimple)
+        contactList.adapter = arrayAdapter
+
+        // Make a function for clicking on items
+        contactList.onItemClickListener = AdapterView.OnItemClickListener { adapterView, _, position, _ ->
+            val selectedItem = adapterView.getItemAtPosition(position) as String
+            val itemIdAtPos = adapterView.getItemIdAtPosition(position)
+
+            Toast.makeText(applicationContext,"click item $selectedItem its position $itemIdAtPos",Toast.LENGTH_SHORT).show()
+        }
     }
 
 
