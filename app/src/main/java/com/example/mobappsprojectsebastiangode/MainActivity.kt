@@ -209,10 +209,17 @@ class MainActivity : AppCompatActivity() {
         // Create arrayAdapter to display a list
         val arrayAdapter: ArrayAdapter<*>
 
-        // Simplify the data class LocalService.Contact to a String
+        // data class for mapping contactID to listID
+        data class IdMap(
+            val list_id : String ,
+            val contact_id : String, )
+
+        // Simplify the data class LocalService.Contact to a String and map contactID to listID
         val contactSimple = ArrayList<String>()
-        for (contact in contacts) {
-            contactSimple.add(contact.name + "\n" + contact.number)
+        val idMapping = ArrayList<IdMap>()
+        for (i in contacts.indices) {
+            contactSimple.add(contacts[i].name + "\n" + contacts[i].number)
+            idMapping.add(IdMap(i.toString(), contacts[i].id))
         }
 
         // Get the listView on the Home Fragment
@@ -226,11 +233,19 @@ class MainActivity : AppCompatActivity() {
         contactList.adapter = arrayAdapter
 
         // Make a function for clicking on items
-        contactList.onItemClickListener = AdapterView.OnItemClickListener { adapterView, _, position, _ ->
+        contactList.onItemClickListener = AdapterView.OnItemClickListener { adapterView, _,
+                                                                            position, _ ->
             val selectedItem = adapterView.getItemAtPosition(position) as String
             val itemIdAtPos = adapterView.getItemIdAtPosition(position)
 
-            Toast.makeText(applicationContext,"click item $selectedItem its position $itemIdAtPos",Toast.LENGTH_SHORT).show()
+            var contactId = ""
+            for (ids in idMapping) {
+                if (itemIdAtPos == ids.list_id.toLong()) {
+                    contactId = ids.contact_id
+                }
+            }
+
+            Toast.makeText(applicationContext,"click item $selectedItem its position $itemIdAtPos with contactID $contactId",Toast.LENGTH_SHORT).show()
         }
     }
 
