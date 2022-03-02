@@ -7,12 +7,15 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.provider.ContactsContract
+import android.util.JsonWriter
 import android.util.Log
+import com.google.gson.Gson
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class LocalService : Service() {
+
     // Binder given to clients
     private val binder = LocalBinder()
 
@@ -79,6 +82,13 @@ class LocalService : Service() {
 
         // returns data class / object Contact with all contacts which exist on the phone
         return outputList
+    }
+
+    fun generateJson(Contact : Contact): String {
+        val gson = Gson()
+        val jsonstring = gson.toJson(Contact)
+        Log.w("TestJsonString: ",jsonstring)
+        return jsonstring
     }
 }
 

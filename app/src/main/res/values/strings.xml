@@ -13,4 +13,7 @@
     <string name="person">Person</string>
     <string name="phone">Phone</string>
     <string name="name">Name</string>
+    <string name="save">Save as file</string>
+    <string name="retrieve">Retrieve Json</string>
+    <string name="errorContactSelection">No Contact Selected on Home Screen!</string>
 </resources>

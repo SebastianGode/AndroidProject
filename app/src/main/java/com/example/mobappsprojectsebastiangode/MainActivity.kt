@@ -14,10 +14,14 @@ import com.google.android.material.navigation.NavigationView
 import android.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import android.widget.TextView
+import androidx.core.view.forEach
+import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,6 +33,9 @@ class MainActivity : AppCompatActivity() {
     private var mBound: Boolean = false
 
     var permissionReadContact: Boolean = false
+    var permissionWriteFiles: Boolean = false
+
+    private var selectedContactJson: String = ""
 
 
     /** Defines callbacks for service binding, passed to bindService()  */
@@ -47,6 +54,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -211,8 +219,9 @@ class MainActivity : AppCompatActivity() {
 
         // data class for mapping contactID to listID
         data class IdMap(
-            val list_id : String ,
-            val contact_id : String, )
+            val list_id: String,
+            val contact_id: String,
+        )
 
         // Simplify the data class LocalService.Contact to a String and map contactID to listID
         val contactSimple = ArrayList<String>()
@@ -232,11 +241,16 @@ class MainActivity : AppCompatActivity() {
             R.layout.contact_list_template, id, contactSimple)
         contactList.adapter = arrayAdapter
 
+
+
         // Make a function for clicking on items
-        contactList.onItemClickListener = AdapterView.OnItemClickListener { adapterView, _,
+        contactList.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view,
                                                                             position, _ ->
             val selectedItem = adapterView.getItemAtPosition(position) as String
             val itemIdAtPos = adapterView.getItemIdAtPosition(position)
+
+            view.setBackgroundColor(ContextCompat.getColor(this, R.color.purple_200))
+
 
             var contactId = ""
             for (ids in idMapping) {
@@ -245,9 +259,93 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            Toast.makeText(applicationContext,"click item $selectedItem its position $itemIdAtPos with contactID $contactId",Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,"selected contact $selectedItem with contactID $contactId",Toast.LENGTH_SHORT).show()
+            if (mBound) {
+                // save selected Contact as JSON as var
+                val selectedItemClass = contacts.find { it.id == contactId }
+                if (selectedItemClass != null) {
+                    selectedContactJson = mService.generateJson(selectedItemClass)
+                }
+
+            }
         }
     }
+
+    fun onRetrieveButtonClick(v: View) {
+        if (selectedContactJson != "") {
+            findViewById<TextView>(R.id.exportStringTextView).text = selectedContactJson
+        }
+        else {
+            findViewById<TextView>(R.id.exportStringTextView).text = getString(R.string.errorContactSelection)
+        }
+    }
+
+    fun onSaveFileButtonClick(v: View) {
+
+
+        // Create AlertDialog if Permission has not been granted
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.notice)
+        // Set message
+        builder.setMessage(R.string.alertContact)
+        // Add an okay button and call the Request Permissions on clicking it
+        builder.setNeutralButton(R.string.ok){ _,_ ->
+            // Open the Dialog to allow permissions
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // Permission granted, so set check to true
+                    permissionWriteFiles = true
+                }
+
+                ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) -> {
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    )
+                }
+                else -> {
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    )
+                }
+            }
+        }
+
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.setCancelable(false)
+        // Show the Dialog when Permission isn't granted
+        if (
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_DENIED) {
+            alertDialog.show()
+        }
+        else {
+            permissionWriteFiles = true
+        }
+
+
+
+        // Write to file
+        if (permissionWriteFiles) {
+            val path = getExternalFilesDir(null)
+            Log.e("Path: ", path.toString())
+            val directory = File(path, "contacts")
+            directory.mkdirs()
+            val file = File(directory, "exportContact.json")
+            file.createNewFile()
+            file.appendText("record goes here")
+        }
+
+
+    }
+
 
 
 
