@@ -16,4 +16,6 @@
     <string name="save">Save as file</string>
     <string name="retrieve">Retrieve Json</string>
     <string name="errorContactSelection">No Contact Selected on Home Screen!</string>
+    <string name="readFile">Read File</string>
+    <string name="importFile">Import File</string>
 </resources>

@@ -14,7 +14,6 @@ import com.google.android.material.navigation.NavigationView
 import android.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Environment
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,6 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.widget.TextView
 import androidx.core.view.forEach
+import com.google.gson.Gson
 import java.io.File
 
 
@@ -131,8 +131,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** Called when a button is clicked (the button in the layout file attaches to
-     * this method with the android:onClick attribute)  */
-    fun onContactListButtonClick(v: View) {
+     * this method with the android:onClick attribute) */
+    // It needs an View parameter to work, but I don't need it in code. So suppressing the warning.
+    fun onContactListButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
         Log.e("Test:", mBound.toString())
         // If boundService connected start the actual activity
         if (mBound) {
@@ -275,7 +276,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onRetrieveButtonClick(v: View) {
+    fun onRetrieveButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
         if (selectedContactJson != "") {
             findViewById<TextView>(R.id.exportStringTextView).text = selectedContactJson
         }
@@ -284,7 +285,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onSaveFileButtonClick(v: View) {
+    fun onSaveFileButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
 
 
         // Create AlertDialog if Permission has not been granted
@@ -337,19 +338,10 @@ class MainActivity : AppCompatActivity() {
 
         Log.e("Write Files:", permissionWriteFiles.toString())
 
-        // Write to file
+        // Write to file using the Bound Service method
         if (selectedContactJson != "") {
-            val path = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-//            val path = getExternalFilesDir(null)
-            Log.e("Dir: ", path.toString())
-            val directory = File(path, "contacts")
-            directory.mkdirs()
-            Log.e("Directory", directory.toString())
-            val file = File(directory, "exportContact.json")
-            file.createNewFile()
-            file.writeText(selectedContactJson)
-            val contents = file.readText()
-            if (contents != "") {
+            if (mBound) {
+                val directory = mService.writeFile(selectedContactJson)
                 Toast.makeText(applicationContext,("Saved file under $directory"),
                     Toast.LENGTH_LONG).show()
             }
@@ -358,8 +350,36 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext,"No contact selected!",
                 Toast.LENGTH_SHORT).show()
         }
+    }
+
+    // Show the contents of the file using the read method of the Service
+    fun onReadFileButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
+        if (mBound) {
+            val contents = mService.readFile()
+            Log.e("readText: ", contents)
+            findViewById<TextView>(R.id.readFileImportTextView).text = contents
+        }
+    }
+
+    fun onImportFileButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
+        val gson = Gson()
+        if (mBound) {
+            val contents = mService.readFile()
+            // Try to catch an error for wrong files
+            try {
+                // Parse JSON input to the Contact data class defined in LocalService
+                val contactEntity = gson.fromJson(contents, LocalService.Contact::class.java)
+                Log.e("Entity: ",contactEntity.toString())
+                // Call the service method to import the contact
+                mService.importContact(contactEntity)
+            }
+            catch (e: Exception) {
+                Toast.makeText(applicationContext,"Malformed Input File!",
+                    Toast.LENGTH_SHORT).show()
+            }
 
 
+        }
     }
 
 

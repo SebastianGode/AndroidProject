@@ -5,11 +5,14 @@ import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
+import android.os.Environment
 import android.os.IBinder
 import android.provider.ContactsContract
 import android.util.JsonWriter
 import android.util.Log
+import androidx.core.app.ActivityCompat.startActivityForResult
 import com.google.gson.Gson
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -41,7 +44,7 @@ class LocalService : Service() {
 
     // Create a data class for the contact list
     data class Contact(
-        val id : String ,
+        val id : String,
         val name : String,
         val number : String)
 
@@ -89,6 +92,34 @@ class LocalService : Service() {
         val jsonstring = gson.toJson(Contact)
         Log.w("TestJsonString: ",jsonstring)
         return jsonstring
+    }
+
+    // method for Reading the JSON out of the file
+    fun readFile(): String {
+        val path = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+        val directory = File(path, "contacts")
+        val file = File(directory, "exportContact.json")
+        return file.readText()
+    }
+    // method for writing the json file to phone storage
+    fun writeFile(selectedContactJson: String): String {
+        val path = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+        val directory = File(path, "contacts")
+        directory.mkdirs()
+        val file = File(directory, "exportContact.json")
+        file.createNewFile()
+        file.writeText(selectedContactJson)
+        // Return the directory
+        return directory.toString()
+    }
+    // method to import a contact from a contact data class
+    fun importContact(Contact: Contact) {
+        val intent = Intent(ContactsContract.Intents.Insert.ACTION)
+        intent.type = ContactsContract.RawContacts.CONTENT_TYPE
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.putExtra(ContactsContract.Intents.Insert.NAME, Contact.name)
+        intent.putExtra(ContactsContract.Intents.Insert.PHONE, Contact.number)
+        startActivity(intent)
     }
 }
 
