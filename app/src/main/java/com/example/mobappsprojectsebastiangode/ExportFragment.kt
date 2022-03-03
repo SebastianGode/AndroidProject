@@ -23,7 +23,7 @@ class ExportFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        Log.e("TestOpen: ", "Started")
     }
+
 
 }

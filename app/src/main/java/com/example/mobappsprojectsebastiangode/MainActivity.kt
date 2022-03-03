@@ -15,6 +15,7 @@ import android.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Environment
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -32,10 +33,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mService: LocalService
     private var mBound: Boolean = false
 
-    var permissionReadContact: Boolean = false
-    var permissionWriteFiles: Boolean = false
+    private var permissionReadContact: Boolean = false
+    private var permissionWriteFiles: Boolean = false
 
-    private var selectedContactJson: String = ""
+    var selectedContactJson: String = ""
 
 
     /** Defines callbacks for service binding, passed to bindService()  */
@@ -142,7 +143,6 @@ class MainActivity : AppCompatActivity() {
             if (permissionReadContact) {
                 // get all contacts which have an email or phone number
                 val names = mService.getContacts()
-                Toast.makeText(this, "number: $names", Toast.LENGTH_SHORT).show()
                 listContacts(names)
             }
 
@@ -249,6 +249,9 @@ class MainActivity : AppCompatActivity() {
             val selectedItem = adapterView.getItemAtPosition(position) as String
             val itemIdAtPos = adapterView.getItemIdAtPosition(position)
 
+            // Change color for selected item to purple and all others to white
+            contactList.forEach { it.setBackgroundColor(ContextCompat.getColor(this,
+                R.color.white)) }
             view.setBackgroundColor(ContextCompat.getColor(this, R.color.purple_200))
 
 
@@ -259,7 +262,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            Toast.makeText(applicationContext,"selected contact $selectedItem with contactID $contactId",Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,"Selected contact $selectedItem",
+                Toast.LENGTH_LONG).show()
             if (mBound) {
                 // save selected Contact as JSON as var
                 val selectedItemClass = contacts.find { it.id == contactId }
@@ -331,16 +335,28 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        Log.e("Write Files:", permissionWriteFiles.toString())
 
         // Write to file
-        if (permissionWriteFiles) {
-            val path = getExternalFilesDir(null)
-            Log.e("Path: ", path.toString())
+        if (selectedContactJson != "") {
+            val path = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+//            val path = getExternalFilesDir(null)
+            Log.e("Dir: ", path.toString())
             val directory = File(path, "contacts")
             directory.mkdirs()
+            Log.e("Directory", directory.toString())
             val file = File(directory, "exportContact.json")
             file.createNewFile()
-            file.appendText("record goes here")
+            file.writeText(selectedContactJson)
+            val contents = file.readText()
+            if (contents != "") {
+                Toast.makeText(applicationContext,("Saved file under $directory"),
+                    Toast.LENGTH_LONG).show()
+            }
+        }
+        else {
+            Toast.makeText(applicationContext,"No contact selected!",
+                Toast.LENGTH_SHORT).show()
         }
 
 
