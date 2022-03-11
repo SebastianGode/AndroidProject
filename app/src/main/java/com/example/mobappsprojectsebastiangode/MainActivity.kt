@@ -14,6 +14,7 @@ import com.google.android.material.navigation.NavigationView
 import android.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Environment
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     var selectedContactJson: String = ""
 
 
-    /** Defines callbacks for service binding, passed to bindService()  */
+    // Defines callbacks for service binding, passed to bindService()
     private val connection = object : ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName?, service: IBinder?) {
@@ -54,19 +55,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Returns true if the device has a big screen (e.g. Tablet)
+    private fun isBigScreen(context: Context): Boolean {
+        return ((context.resources.configuration.screenLayout
+                and Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        drawerLayout = findViewById(R.id.drawerLayout)
+        if(!isBigScreen(this)) {
+            drawerLayout = findViewById(R.id.drawerLayout)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setHomeButtonEnabled(true)
+
+            toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
+            drawerLayout.addDrawerListener(toggle)
+            toggle.syncState()
+        }
+
         val navView : NavigationView = findViewById(R.id.nav_view)
-
-        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         navView.setNavigationItemSelectedListener {
 
@@ -99,8 +110,11 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.replace(R.id.frameLayout, fragment)
         fragmentTransaction.commit()
 
-        // Close Drawer when user clicks on it
-        drawerLayout.closeDrawers()
+        // Check whether the device is big and even has the Drawer
+        if(!isBigScreen(this)) {
+            // Close Drawer when user clicks on it
+            drawerLayout.closeDrawers()
+        }
 
         // Set the correct title of current fragment
         setTitle(title)
@@ -127,12 +141,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        // Unbind from Service and set the check to false
         unbindService(connection)
         mBound = false
     }
 
-    /** Called when a button is clicked (the button in the layout file attaches to
-     * this method with the android:onClick attribute) */
+    // Called when a button is clicked (the button in the layout file attaches to
+    // this method with the android:onClick attribute).
+    // This is the same for all onClick functions here
     // It needs an View parameter to work, but I don't need it in code. So suppressing the warning.
     fun onContactListButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
         // If boundService connected start the actual activity
@@ -213,6 +229,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // Function to create the list of contacts
     private fun listContacts(contacts: ArrayList<LocalService.Contact>) {
         // Create arrayAdapter to display a list
         val arrayAdapter: ArrayAdapter<*>
@@ -336,7 +353,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
         // Write to file using the Bound Service method
         if (selectedContactJson != "") {
             if (mBound) {
@@ -354,6 +370,7 @@ class MainActivity : AppCompatActivity() {
     // Show the contents of the file using the read method of the Service
     fun onReadFileButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
         if (mBound) {
+            // Try to catch an error for wrong files
             try {
                 val contents = mService.readFile()
                 findViewById<TextView>(R.id.readFileImportTextView).text = contents
