@@ -33,4 +33,5 @@
     <string name="export">Export</string>
     <string name="importString">Import</string>
     <string name="edit_contact">Edit Contact</string>
+    <string name="notImplemented">This is not yet implemented!</string>
 </resources>
