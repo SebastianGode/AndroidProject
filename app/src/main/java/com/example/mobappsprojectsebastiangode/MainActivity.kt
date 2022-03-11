@@ -252,7 +252,7 @@ class MainActivity : AppCompatActivity() {
             // Change color for selected item to purple and all others to white
             contactList.forEach { it.setBackgroundColor(ContextCompat.getColor(this,
                 R.color.white)) }
-            view.setBackgroundColor(ContextCompat.getColor(this, R.color.purple_200))
+            view.setBackgroundColor(ContextCompat.getColor(this, R.color.green_200))
 
 
             var contactId = ""
