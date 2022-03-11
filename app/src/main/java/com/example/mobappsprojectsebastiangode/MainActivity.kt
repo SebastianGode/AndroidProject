@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity() {
             // Switch Fragments when user clicks on Items in NavDrawer
             when(it.itemId) {
                 R.id.nav_home -> replaceFragment(HomeFragment(), it.title.toString())
+                R.id.nav_edit -> replaceFragment(EditFragment(), it.title.toString())
                 R.id.nav_import -> replaceFragment(ImportFragment(), it.title.toString())
                 R.id.nav_export -> replaceFragment(ExportFragment(), it.title.toString())
                 R.id.nav_share -> replaceFragment(ShareFragment(), it.title.toString())
@@ -134,12 +135,10 @@ class MainActivity : AppCompatActivity() {
      * this method with the android:onClick attribute) */
     // It needs an View parameter to work, but I don't need it in code. So suppressing the warning.
     fun onContactListButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
-        Log.e("Test:", mBound.toString())
         // If boundService connected start the actual activity
         if (mBound) {
             // Check for Permissions and request if necessary
             alertContactPermission()
-            Log.e("Test:", permissionReadContact.toString())
             // Only start Read Contacts when permission granted, else app will crash
             if (permissionReadContact) {
                 // get all contacts which have an email or phone number
@@ -278,7 +277,8 @@ class MainActivity : AppCompatActivity() {
 
     fun onRetrieveButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
         if (selectedContactJson != "") {
-            findViewById<TextView>(R.id.exportStringTextView).text = selectedContactJson
+            findViewById<TextView>(R.id.exportStringTextView).text =
+                getString(R.string.exportMessage,selectedContactJson)
         }
         else {
             findViewById<TextView>(R.id.exportStringTextView).text = getString(R.string.errorContactSelection)
@@ -336,7 +336,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        Log.e("Write Files:", permissionWriteFiles.toString())
 
         // Write to file using the Bound Service method
         if (selectedContactJson != "") {
@@ -355,21 +354,26 @@ class MainActivity : AppCompatActivity() {
     // Show the contents of the file using the read method of the Service
     fun onReadFileButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
         if (mBound) {
-            val contents = mService.readFile()
-            Log.e("readText: ", contents)
-            findViewById<TextView>(R.id.readFileImportTextView).text = contents
+            try {
+                val contents = mService.readFile()
+                findViewById<TextView>(R.id.readFileImportTextView).text = contents
+            }
+            catch (e: Exception) {
+                Toast.makeText(applicationContext,"Malformed Input File!",
+                    Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     fun onImportFileButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
         val gson = Gson()
         if (mBound) {
-            val contents = mService.readFile()
+
             // Try to catch an error for wrong files
             try {
+                val contents = mService.readFile()
                 // Parse JSON input to the Contact data class defined in LocalService
                 val contactEntity = gson.fromJson(contents, LocalService.Contact::class.java)
-                Log.e("Entity: ",contactEntity.toString())
                 // Call the service method to import the contact
                 mService.importContact(contactEntity)
             }

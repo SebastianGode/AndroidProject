@@ -15,7 +15,22 @@
     <string name="name">Name</string>
     <string name="save">Save as file</string>
     <string name="retrieve">Retrieve Json</string>
+    <string name="exportMessage">The following JSON will be written to the file: %1$s</string>
     <string name="errorContactSelection">No Contact Selected on Home Screen!</string>
     <string name="readFile">Read File</string>
     <string name="importFile">Import File</string>
+    <string name="exportTutorial">Click the button below to get a preview of what gets written to
+        the export file!</string>
+    <string name="exportSaveTutorial">This button will save the JSON to the file under
+        /storage/emulated/0/Android/data/com.example.mobappsprojectsebastiangode/files/Download/contacts</string>
+    <string name="importReadTutorial">Click the button below to get a preview of the file contents
+        from
+        /storage/emulated/0/Android/data/com.example.mobappsprojectsebastiangode/files/Download/contacts
+    </string>
+    <string name="importSave">Press here to import the contact!</string>
+    <string name="communicate">Communicate</string>
+    <string name="share">Share</string>
+    <string name="export">Export</string>
+    <string name="importString">Import</string>
+    <string name="edit_contact">Edit Contact</string>
 </resources>

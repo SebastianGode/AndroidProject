@@ -10,28 +10,33 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_baseline_home_24"
-            android:title="Home"/>
+            android:title="@string/home"/>
+
+        <item
+            android:id="@+id/nav_edit"
+            android:icon="@drawable/ic_baseline_edit_24"
+            android:title="@string/edit_contact"/>
 
         <item
             android:id="@+id/nav_import"
             android:icon="@drawable/ic_baseline_arrow_downward_24"
-            android:title="Import"/>
+            android:title="@string/importString"/>
 
         <item
             android:id="@+id/nav_export"
             android:icon="@drawable/ic_baseline_arrow_upward_24"
-            android:title="Export"/>
+            android:title="@string/export"/>
 
     </group>
 
-        <item android:title="communicate">
+        <item android:title="@string/communicate">
             <menu>
                 <group android:checkableBehavior="single">
 
                     <item
                         android:id="@+id/nav_share"
                         android:icon="@drawable/ic_baseline_share_24"
-                        android:title="Share"/>
+                        android:title="@string/share"/>
 
                 </group>
 

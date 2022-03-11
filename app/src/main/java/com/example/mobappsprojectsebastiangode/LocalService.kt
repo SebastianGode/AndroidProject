@@ -90,7 +90,6 @@ class LocalService : Service() {
     fun generateJson(Contact : Contact): String {
         val gson = Gson()
         val jsonstring = gson.toJson(Contact)
-        Log.w("TestJsonString: ",jsonstring)
         return jsonstring
     }
 
