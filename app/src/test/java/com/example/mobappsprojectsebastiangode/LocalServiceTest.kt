@@ -1,21 +1,17 @@
 package com.example.mobappsprojectsebastiangode
 
+import android.os.Environment
 import android.provider.ContactsContract
 import android.util.Log
+import com.google.gson.Gson
 import junit.framework.TestCase
 import org.junit.Assert.*
 import org.junit.Test
+import java.io.File
 import java.lang.Math.random
 import java.util.*
 
 class LocalServiceTest {
-    @Test
-    fun checkRandomNumber() {
-        val testGenerator = Random()
-        val output = testGenerator.nextInt(100)
-        assertTrue(output >= 0 && output < 100)
-    }
-
     @Test
     fun checkGetContacts() {
         val names = ArrayList<LocalService.Contact>()
@@ -46,5 +42,35 @@ class LocalServiceTest {
         assertEquals(outputList.size, 1)
         assertEquals(names.size, 2)
 
+    }
+
+    @Test
+    fun checkGenerateJson(){
+        // Create a dummy contact as data class
+        val contact = LocalService.Contact("1","Test","112")
+
+        // Convert it to JSON like the LocalService does
+        val gson = Gson()
+        val jsonString = gson.toJson(contact)
+
+        // Assert that the JSON string is as expected
+        val expectedString = "{\"id\":\"1\",\"name\":\"Test\",\"number\":\"112\"}"
+        assertEquals(jsonString, expectedString)
+
+    }
+
+    @Test
+    fun checkParseJson() {
+        // Create a dummy JSON
+        val jsonString = "{\"id\":\"1\",\"name\":\"Test\",\"number\":\"112\"}"
+
+        // Generate contact data class from JSON
+        val gson = Gson()
+        val outputContact = gson.fromJson(jsonString, LocalService.Contact::class.java)
+
+        // Check that the parsing was correct
+        assertEquals(outputContact.id, "1")
+        assertEquals(outputContact.name, "Test")
+        assertEquals(outputContact.number, "112")
     }
 }

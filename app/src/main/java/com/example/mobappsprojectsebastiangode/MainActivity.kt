@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     private var permissionReadContact: Boolean = false
     private var permissionWriteFiles: Boolean = false
+    private var permissionWriteContact: Boolean = false
 
     var selectedContactJson: String = ""
 
@@ -303,8 +304,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onSaveFileButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
-
-
         // Create AlertDialog if Permission has not been granted
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.notice)
@@ -362,7 +361,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         else {
-            Toast.makeText(applicationContext,"No contact selected!",
+            Toast.makeText(applicationContext,getString(R.string.noContactSelected),
                 Toast.LENGTH_SHORT).show()
         }
     }
@@ -376,31 +375,86 @@ class MainActivity : AppCompatActivity() {
                 findViewById<TextView>(R.id.readFileImportTextView).text = contents
             }
             catch (e: Exception) {
-                Toast.makeText(applicationContext,"Malformed Input File!",
+                Toast.makeText(applicationContext,getString(R.string.malformedInputFile),
                     Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    // Import the file
     fun onImportFileButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
-        val gson = Gson()
         if (mBound) {
-
             // Try to catch an error for wrong files
             try {
                 val contents = mService.readFile()
-                // Parse JSON input to the Contact data class defined in LocalService
-                val contactEntity = gson.fromJson(contents, LocalService.Contact::class.java)
-                // Call the service method to import the contact
-                mService.importContact(contactEntity)
+
+                if (mBound) {
+                    // Parse JSON input
+                    val contactEntity = mService.parseJson(contents)
+                    // Call the service method to import the contact
+                    mService.importContact(contactEntity)
+                }
             }
             catch (e: Exception) {
-                Toast.makeText(applicationContext,"Malformed Input File!",
+                Toast.makeText(applicationContext,getString(R.string.malformedInputFile),
                     Toast.LENGTH_SHORT).show()
             }
 
 
         }
+    }
+
+    // Show all Edit fields and get Contact information
+    fun onEditContactReadButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
+        if (mBound) {
+            // If user has selected a contact go ahead, else throw error message
+            if (selectedContactJson != "") {
+                // Parse JSON input
+                val contactEntity = mService.parseJson(selectedContactJson)
+                // Change TextView to show the contact's name
+                findViewById<TextView>(R.id.editContactNameTextView).text = getString(
+                    R.string.editNameText, contactEntity.name)
+                // Make the TextView in front of the phone number as well as the edit field visible
+                findViewById<TextView>(R.id.editPhoneNumberTextView).visibility = View.VISIBLE
+                val editPhone = findViewById<EditText>(R.id.editTextPhoneNumberPhone)
+                editPhone.visibility = View.VISIBLE
+                editPhone.setText(contactEntity.number)
+                // Make the save button visible too
+                findViewById<Button>(R.id.editContactSaveButton).visibility = View.VISIBLE
+            }
+            else {
+                Toast.makeText(applicationContext,getString(R.string.noContactSelected),
+                    Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun onEditContactSaveButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
+        // Open the Dialog to allow Write permissions to contacts
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_CONTACTS
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // Permission granted, so set check to true
+                permissionWriteContact = true
+            }
+
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.WRITE_CONTACTS
+            ) -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.WRITE_CONTACTS
+                )
+            }
+            else -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.WRITE_CONTACTS
+                )
+            }
+        }
+        Log.w("permission: ", permissionWriteContact.toString())
     }
 
 

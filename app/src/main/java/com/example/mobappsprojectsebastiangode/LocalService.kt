@@ -8,9 +8,6 @@ import android.os.Binder
 import android.os.Environment
 import android.os.IBinder
 import android.provider.ContactsContract
-import android.util.JsonWriter
-import android.util.Log
-import androidx.core.app.ActivityCompat.startActivityForResult
 import com.google.gson.Gson
 import java.io.File
 import java.util.*
@@ -87,10 +84,9 @@ class LocalService : Service() {
         return outputList
     }
 
-    fun generateJson(Contact : Contact): String {
+    fun generateJson(Contact: Contact): String {
         val gson = Gson()
-        val jsonstring = gson.toJson(Contact)
-        return jsonstring
+        return gson.toJson(Contact)
     }
 
     // method for Reading the JSON out of the file
@@ -120,6 +116,12 @@ class LocalService : Service() {
         intent.putExtra(ContactsContract.Intents.Insert.PHONE, Contact.number)
         startActivity(intent)
     }
+    // method to parse JSON to contact data class
+    fun parseJson(JsonString: String): Contact {
+        val gson = Gson()
+        return gson.fromJson(JsonString, Contact::class.java)
+    }
+
 }
 
 

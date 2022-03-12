@@ -24,6 +24,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/exportRetrieveButton" />
 
+        <!-- Ignore TextContrastCheck as text is readable without issues -->
         <Button
             android:id="@+id/exportSaveButton"
             android:layout_width="wrap_content"
@@ -31,12 +32,14 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="32dp"
-            android:text="@string/save"
             android:onClick="onSaveFileButtonClick"
+            android:text="@string/save"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="TextContrastCheck" />
 
+        <!-- Ignore TextContrastCheck as text is readable without issues -->
         <Button
             android:id="@+id/exportRetrieveButton"
             android:layout_width="wrap_content"
@@ -46,7 +49,8 @@
             android:text="@string/retrieve"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/exportTutorialTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/exportTutorialTextView"
+            tools:ignore="TextContrastCheck" />
 
         <TextView
             android:id="@+id/exportTutorialTextView"

@@ -8,6 +8,8 @@
     <string name="getContactList">Get Contact List</string>
     <string name="alertContact">This App needs access to access your Contacts, please allow it in
         the following dialog.</string>
+    <string name="alertContactWrite">In order to save the contact this app needs Write permissions
+        for your contacts.</string>
     <string name="ok">OK</string>
     <string name="notice">Notice</string>
     <string name="person">Person</string>
@@ -34,4 +36,13 @@
     <string name="importString">Import</string>
     <string name="edit_contact">Edit Contact</string>
     <string name="notImplemented">This is not yet implemented!</string>
+    <string name="editTutorialRead">Click the button below to start editing the selected
+        contact!</string>
+    <string name="editContact">Edit selected Contact</string>
+    <string name="editContactSave">Save the Contact</string>
+    <string name="editPhoneNumber">Phone Number:</string>
+    <string name="editNameText">Name: %1$s</string>
+    <string name="noContactSelected">No contact selected!</string>
+    <string name="malformedInputFile">Malformed input file!</string>
+    <string name="NavHeader">Mobile Applikationen App</string>
 </resources>

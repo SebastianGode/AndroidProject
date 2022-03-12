@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Ignore TextContrastCheck as text is readable without issues -->
         <Button
             android:id="@+id/readFileImportButton"
             android:layout_width="wrap_content"
@@ -21,7 +22,8 @@
             android:text="@string/readFile"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            app:layout_constraintTop_toBottomOf="@+id/textView"
+            tools:ignore="TextContrastCheck" />
 
         <TextView
             android:id="@+id/readFileImportTextView"
@@ -34,6 +36,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/readFileImportButton" />
 
+        <!-- Ignore TextContrastCheck as text is readable without issues -->
         <Button
             android:id="@+id/importFileImportButton"
             android:layout_width="wrap_content"
@@ -41,11 +44,12 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="32dp"
-            android:text="@string/importFile"
             android:onClick="onImportFileButtonClick"
+            android:text="@string/importFile"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="TextContrastCheck" />
 
         <TextView
             android:id="@+id/textView"
