@@ -4,7 +4,6 @@ import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -15,43 +14,46 @@ import android.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.os.Environment
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.widget.TextView
 import androidx.core.view.forEach
-import com.google.gson.Gson
-import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
 
+    // vars for drawer
     lateinit var toggle : ActionBarDrawerToggle
     lateinit var drawerLayout: DrawerLayout
 
+    // vars to access BoundService
     private lateinit var mService: LocalService
     private var mBound: Boolean = false
 
+    // vars to check for permissions
     private var permissionReadContact: Boolean = false
     private var permissionWriteFiles: Boolean = false
     private var permissionWriteContact: Boolean = false
 
+    // var to store the selected Contact
     var selectedContactJson: String = ""
 
-
+    // This is code from the example https://developer.android.com/guide/components/bound-services
     // Defines callbacks for service binding, passed to bindService()
     private val connection = object : ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName?, service: IBinder?) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            // Bounding to LocalService complete, now cast Binder and get the service
             val binder = service as LocalService.LocalBinder
             mService = binder.getService()
+            // Set mBound to true for checks that service is correctly bound
             mBound = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
+            // Set mBound to false for checks that service is not bound
             mBound = false
         }
     }
@@ -68,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // We only have an drawer layout on small devices, so don't do this on big Screens
         if(!isBigScreen(this)) {
             drawerLayout = findViewById(R.id.drawerLayout)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -104,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         replaceFragment(HomeFragment(), getString(R.string.home))
     }
 
-    // Method for replacing fragments
+    // method for replacing fragments
     private fun replaceFragment(fragment: Fragment, title : String) {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -151,6 +154,7 @@ class MainActivity : AppCompatActivity() {
     // this method with the android:onClick attribute).
     // This is the same for all onClick functions here
     // It needs an View parameter to work, but I don't need it in code. So suppressing the warning.
+    // Suppressing this warning on every onClick method from now on
     fun onContactListButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
         // If boundService connected start the actual activity
         if (mBound) {
@@ -299,7 +303,8 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.exportMessage,selectedContactJson)
         }
         else {
-            findViewById<TextView>(R.id.exportStringTextView).text = getString(R.string.errorContactSelection)
+            findViewById<TextView>(R.id.exportStringTextView).text = getString(
+                R.string.errorContactSelection)
         }
     }
 
@@ -481,34 +486,5 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT).show()
             }
         }
-
-
-
-
     }
-
-
-
-
-
-
-
-//    @SuppressLint("Range")
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        when (requestCode) {
-//            pickContact -> if (resultCode == RESULT_OK) {
-//                val contactData: Uri? = data?.data
-//                val c: Cursor? = contactData?.let { contentResolver.query(it, null, null, null, null) }
-//                if (c != null) {
-//                    if (c.moveToFirst()) {
-//                        val name: String =
-//                            c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-//                        Toast.makeText(this, "Name: $name", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }
-//        }
-//    }
-
 }

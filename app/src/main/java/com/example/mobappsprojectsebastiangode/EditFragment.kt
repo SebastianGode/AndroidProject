@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
+// Creates the EditFragment
 class EditFragment : Fragment() {
 
     override fun onCreateView(

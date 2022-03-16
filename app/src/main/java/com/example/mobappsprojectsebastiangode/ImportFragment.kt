@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
+// Creates the ImportFragment
 class ImportFragment : Fragment() {
 
     override fun onCreateView(

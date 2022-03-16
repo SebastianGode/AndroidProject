@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 class ExportFragment : Fragment() {
-    var jsonfile: String = ""
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

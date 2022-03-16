@@ -9,7 +9,6 @@ import android.os.Binder
 import android.os.Environment
 import android.os.IBinder
 import android.provider.ContactsContract
-import android.provider.Telephony.Mms.Addr.CONTACT_ID
 import com.google.gson.Gson
 import java.io.File
 import java.util.*
@@ -21,17 +20,8 @@ class LocalService : Service() {
     // Binder given to clients
     private val binder = LocalBinder()
 
-    // Random number generator
-    private val mGenerator = Random()
-
-    /** method for clients  */
-    val randomNumber: Int
-        get() = mGenerator.nextInt(100)
-
-    /**
-     * Class used for the client Binder.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with IPC.
-     */
+    //    Class used for the client Binder.  Because we know this service always
+    //    runs in the same process as its clients, we don't need to deal with IPC.
     inner class LocalBinder : Binder() {
         // Return this instance of LocalService so clients can call public methods
         fun getService(): LocalService = this@LocalService
@@ -47,7 +37,7 @@ class LocalService : Service() {
         val name : String,
         val number : String)
 
-    // Suppress Warning for cursor that it needs to be bigger than 0
+    // Suppress Warning for cursor that it needs to be bigger than 0 because that's always the case
     @SuppressLint("Range")
     // private Function to get contact list as array
     private fun getNamePhoneDetails(): ArrayList<Contact> {
@@ -59,9 +49,12 @@ class LocalService : Service() {
         if (cur!!.count > 0) {
             // Add all contact Names+Numbers+ID to array
             while (cur.moveToNext()) {
-                val id = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NAME_RAW_CONTACT_ID))
-                val name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
-                val number = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                val id = cur.getString(cur.getColumnIndex(
+                    ContactsContract.CommonDataKinds.Phone.NAME_RAW_CONTACT_ID))
+                val name = cur.getString(cur.getColumnIndex(
+                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
+                val number = cur.getString(cur.getColumnIndex(
+                    ContactsContract.CommonDataKinds.Phone.NUMBER))
                 names.add(Contact(id , name , number))
             }
         }
@@ -130,8 +123,11 @@ class LocalService : Service() {
         contentValues.put(ContactsContract.CommonDataKinds.Phone.NUMBER, newContact.number)
 
         // Search requests for the contact
-        val where = ContactsContract.Data.CONTACT_ID + "=?" + " AND " + ContactsContract.Data.MIMETYPE + "=?" + " AND " + ContactsContract.CommonDataKinds.Phone.NUMBER + "=?"
-        val whereArgs = arrayOf((existingContact.id), ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE, existingContact.number)
+        val where = (ContactsContract.Data.CONTACT_ID + "=?" + " AND " +
+                ContactsContract.Data.MIMETYPE + "=?" + " AND " +
+                ContactsContract.CommonDataKinds.Phone.NUMBER + "=?")
+        val whereArgs = arrayOf((existingContact.id),
+                ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE, existingContact.number)
 
         // Update the contact
         contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, whereArgs)
