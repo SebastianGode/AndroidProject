@@ -3,11 +3,13 @@ package com.example.mobappsprojectsebastiangode
 
 import android.annotation.SuppressLint
 import android.app.Service
+import android.content.ContentValues
 import android.content.Intent
 import android.os.Binder
 import android.os.Environment
 import android.os.IBinder
 import android.provider.ContactsContract
+import android.provider.Telephony.Mms.Addr.CONTACT_ID
 import com.google.gson.Gson
 import java.io.File
 import java.util.*
@@ -122,60 +124,17 @@ class LocalService : Service() {
         return gson.fromJson(JsonString, Contact::class.java)
     }
 
+    // method to update the phone number of a contact by contactID
+    fun updateContact(newContact: Contact, existingContact: Contact) {
+        val contentValues = ContentValues()
+        contentValues.put(ContactsContract.CommonDataKinds.Phone.NUMBER, newContact.number)
+
+        // Search requests for the contact
+        val where = ContactsContract.Data.CONTACT_ID + "=?" + " AND " + ContactsContract.Data.MIMETYPE + "=?" + " AND " + ContactsContract.CommonDataKinds.Phone.NUMBER + "=?"
+        val whereArgs = arrayOf((existingContact.id), ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE, existingContact.number)
+
+        // Update the contact
+        contentResolver.update(ContactsContract.Data.CONTENT_URI, contentValues, where, whereArgs)
+    }
+
 }
-
-
-//fun getNameEmailDetails(): ArrayList<String>? {
-//    val names = ArrayList<String>()
-//    val cr: ContentResolver = getContentResolver()
-//    val cur: Cursor? = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null)
-//    if (cur.getCount() > 0) {
-//        while (cur.moveToNext()) {
-//            val id: String = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID))
-//            val cur1: Cursor? = cr.query(
-//                ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
-//                ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", arrayOf(id), null
-//            )
-//            while (cur1.moveToNext()) {
-//                //to get the contact names
-//                val name: String =
-//                    cur1.getString(cur1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
-//                Log.e("Name :", name)
-//                val email: String =
-//                    cur1.getString(cur1.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA))
-//                Log.e("Email", email)
-//                if (email != null) {
-//                    names.add(name)
-//                }
-//            }
-//            cur1.close()
-//        }
-//    }
-//    return names
-//}
-
-
-
-
-//private fun doIt() {
-//    val contentResolver: ContentResolver = getContentResolver()
-//    // IDs und Namen aller sichtbaren Kontakte ermitteln
-//    val mainQueryProjection = arrayOf(
-//        ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME
-//    )
-//    val mainQuerySelection = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = ?"
-//    val mainQuerySelectionArgs = arrayOf("1")
-//    val mainQueryCursor: Cursor? = contentResolver.query(
-//        ContactsContract.Contacts.CONTENT_URI, mainQueryProjection, mainQuerySelection,
-//        mainQuerySelectionArgs, null
-//    )
-//    // Trefferliste abarbeiten...
-//    if (mainQueryCursor != null) {
-//        while (mainQueryCursor.moveToNext()) {
-//            val contactId: String = mainQueryCursor.getString(0)
-//            val displayName: String = mainQueryCursor.getString(1)
-//            tv.append("===> $displayName ($contactId)\n")
-//        }
-//        mainQueryCursor.close()
-//    }
-//}

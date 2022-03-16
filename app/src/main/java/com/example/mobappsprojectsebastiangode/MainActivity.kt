@@ -406,6 +406,30 @@ class MainActivity : AppCompatActivity() {
 
     // Show all Edit fields and get Contact information
     fun onEditContactReadButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
+        // Open the Dialog to allow Write permissions to contacts if not exist
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_CONTACTS
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // Permission granted, so set check to true
+                permissionWriteContact = true
+            }
+
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.WRITE_CONTACTS
+            ) -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.WRITE_CONTACTS
+                )
+            }
+            else -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.WRITE_CONTACTS
+                )
+            }
+        }
         if (mBound) {
             // If user has selected a contact go ahead, else throw error message
             if (selectedContactJson != "") {
@@ -430,31 +454,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onEditContactSaveButtonClick(@Suppress("UNUSED_PARAMETER") v: View) {
-        // Open the Dialog to allow Write permissions to contacts
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_CONTACTS
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                // Permission granted, so set check to true
-                permissionWriteContact = true
-            }
+        if(mBound) {
+            if (selectedContactJson != "") {
+                // Get the selected contactEntity as contact data class
+                val contactEntity = mService.parseJson(selectedContactJson)
 
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.WRITE_CONTACTS
-            ) -> {
-                requestPermissionLauncher.launch(
-                    Manifest.permission.WRITE_CONTACTS
-                )
+                // Get the new Phone Number from the EditText field
+                val newNumber = findViewById<EditText>(R.id.editTextPhoneNumberPhone).text.toString()
+
+                // Create the new contact data class
+                val newContact = LocalService.Contact(contactEntity.id, contactEntity.name,
+                    newNumber)
+
+                // Call the updateContact Function in BoundService
+                mService.updateContact(newContact, contactEntity)
+
+                // Give response that successful
+                Toast.makeText(applicationContext,getString(R.string.contactUpdateSuccessful),
+                    Toast.LENGTH_SHORT).show()
+
+                // Update internal JSON for future use
+                selectedContactJson = mService.generateJson(newContact)
             }
-            else -> {
-                requestPermissionLauncher.launch(
-                    Manifest.permission.WRITE_CONTACTS
-                )
+            else {
+                Toast.makeText(applicationContext,getString(R.string.noContactSelected),
+                    Toast.LENGTH_SHORT).show()
             }
         }
-        Log.w("permission: ", permissionWriteContact.toString())
+
+
+
+
     }
 
 

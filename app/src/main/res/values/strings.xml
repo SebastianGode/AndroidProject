@@ -45,4 +45,5 @@
     <string name="noContactSelected">No contact selected!</string>
     <string name="malformedInputFile">Malformed input file!</string>
     <string name="NavHeader">Mobile Applikationen App</string>
+    <string name="contactUpdateSuccessful">Contact successfully updated!</string>
 </resources>
