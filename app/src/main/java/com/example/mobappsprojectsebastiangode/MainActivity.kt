@@ -22,6 +22,8 @@ import android.widget.TextView
 import androidx.core.view.forEach
 
 
+// App by Sebastian Gode | FDIT HTWK Leipzigc
+
 class MainActivity : AppCompatActivity() {
 
     // vars for drawer
