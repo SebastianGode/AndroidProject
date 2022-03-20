@@ -73,4 +73,21 @@ class LocalServiceTest {
         assertEquals(outputContact.name, "Test")
         assertEquals(outputContact.number, "112")
     }
+
+    @Test
+    fun checkFileOperations() {
+        val jsonString = "{\"id\":\"1\",\"name\":\"Test\",\"number\":\"112\"}"
+
+        // Write to a new File
+        val file = File("test.txt")
+        file.createNewFile()
+        file.writeText(jsonString)
+
+        // Read from the written file
+        val fileRead = File("test.txt")
+        val fileReadResult = fileRead.readText()
+
+        // Check that File could be read and has the same output as input
+        assertEquals(fileReadResult, jsonString)
+    }
 }
